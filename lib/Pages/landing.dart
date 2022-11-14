@@ -34,7 +34,7 @@ class _LandingPageState extends State<LandingPage> {
               backgroundColor: Colors.green,
             ),
             body: const Center(
-              child: ProfilePage(value: 3),
+              child: ProfilePage(),
             ),
           );
         },

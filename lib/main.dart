@@ -4,10 +4,9 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_blue/flutter_blue.dart';
+
 import 'package:HPCS_app/Pages/landing.dart';
 
-final FlutterBlue flutterBlue = FlutterBlue.instance;
 
 void main() {
   runApp(const MyApp());

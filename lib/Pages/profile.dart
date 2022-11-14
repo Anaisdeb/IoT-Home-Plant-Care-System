@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:HPCS_app/Pages/bluetooth.dart';
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
 
-class ProfilePage extends StatelessWidget {
-  final int value;
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
 
-  const ProfilePage({key, this.value = 0})
-      : assert(value != null),
-        super(key: key);
+class _ProfilePageState extends State<ProfilePage> {
 
+  void _bleSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (context) {
+          return Scaffold(
+            body: Center(
+              child: BluetoothSettings(),
+            ),
+          );
+        },
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +100,7 @@ class ProfilePage extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(5, (index) {
-                      return Icon(1 < value ? Icons.star : Icons.star_border,
+                      return Icon(1 < 3 ? Icons.star : Icons.star_border,
                           color: Colors.lightGreen, size: 30);
                     }),
                   ),
@@ -103,7 +118,7 @@ class ProfilePage extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(5, (index) {
                       return Icon(
-                          index < value ? Icons.star : Icons.star_border,
+                          index < 3 ? Icons.star : Icons.star_border,
                           color: Colors.amber,
                           size: 30);
                     }),
@@ -121,7 +136,7 @@ class ProfilePage extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(5, (index) {
-                      return Icon(1 < value ? Icons.star : Icons.star_border,
+                      return Icon(1 < 3 ? Icons.star : Icons.star_border,
                           color: Colors.lightGreen, size: 30);
                     }),
                   ),
@@ -138,7 +153,7 @@ class ProfilePage extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: List.generate(5, (index) {
-                      return Icon(4 < value ? Icons.star : Icons.star_border,
+                      return Icon(4 < 3 ? Icons.star : Icons.star_border,
                           color: Colors.red.shade700, size: 30);
                     }),
                   ),
@@ -174,11 +189,16 @@ class ProfilePage extends StatelessWidget {
                         radius: 20.0,
                         backgroundColor: Colors.lightBlue,
                         child: Icon(Icons.share, color: Colors.white)),
-                    CircleAvatar(
-                        radius: 20.0,
-                        backgroundColor: Colors.lightBlue,
-                        child: Icon(
-                            Icons.settings_bluetooth, color: Colors.white)),
+                    IconButton(
+                        icon: CircleAvatar(
+                            radius: 20.0,
+                            backgroundColor: Colors.lightBlue,
+                            child: Icon(
+                                Icons.settings_bluetooth, color: Colors.white)),
+                        onPressed: _bleSettings,
+                        padding: EdgeInsets.all(0.0),
+                        iconSize: 40
+                    )
                   ])
                 ],
               ),
