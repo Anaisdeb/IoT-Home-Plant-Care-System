@@ -70,7 +70,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_blue:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_blue
       url: "https://pub.dartlang.org"
