@@ -56,9 +56,9 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
                 ),
               ),
               TextButton(
-                child: Text(
+                child: const Text(
                   'Connect',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.blue),
                 ),
                 onPressed: () {},
               ),
