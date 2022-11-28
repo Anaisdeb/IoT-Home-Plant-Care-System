@@ -31,6 +31,10 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
   @override
   void initState() {
     super.initState();
+
+    // DB connection
+    //TODO
+
     // Start scanning
     widget.flutterBlue.startScan(timeout: const Duration(seconds: 4));
 
