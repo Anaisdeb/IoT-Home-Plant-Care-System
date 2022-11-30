@@ -4,11 +4,11 @@
 
 import 'package:flutter/material.dart';
 
-
 import 'package:HPCS_app/Pages/landing.dart';
 
 
-void main() {
+void main() async {
+
   runApp(const MyApp());
 }
 
@@ -23,4 +23,3 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false);
   }
 }
-

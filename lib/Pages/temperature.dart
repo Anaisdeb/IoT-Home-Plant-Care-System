@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:HPCS_app/helper.dart';
+import 'package:HPCS_app/cosmos.dart';
 
 class TemperaturePage extends StatelessWidget {
   final int value;
-
-  const TemperaturePage({key, this.value = 0})
+  Cosmos cosmos = Cosmos( documentDBMasterKey:'insert key');
+  TemperaturePage({key, this.value = 0})
       : assert(value != null),
         super(key: key);
 
@@ -42,6 +43,18 @@ class TemperaturePage extends StatelessWidget {
                                 yValueMapper: (ChartData data,
                                     _) => data.y)
                           ])),
+                  TextButton(
+                    child: const Text(
+                      'Connect',
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onPressed: () async {
+                      Map<String, dynamic> get_dbs = await cosmos.queryCosmos(
+                          url: 'https:// <insterturl>.documents.azure.com:443/dbs', method: 'GET');
+                      print("Hello");
+                      print(get_dbs);
+                    },
+                  ),
                   Container(
                       child: SfCartesianChart(
                           title: ChartTitle(
