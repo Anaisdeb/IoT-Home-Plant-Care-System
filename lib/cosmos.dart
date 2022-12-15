@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:core';
 import 'package:crypto/crypto.dart';
 import 'package:hex/hex.dart';
-import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 
 class Cosmos{
   String documentDBMasterKey;

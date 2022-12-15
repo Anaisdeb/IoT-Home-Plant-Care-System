@@ -14,7 +14,7 @@ packages:
       name: azure_cosmosdb
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.6.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -232,21 +232,21 @@ packages:
       name: syncfusion_flutter_charts
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "20.3.59"
+    version: "20.3.61"
   syncfusion_flutter_core:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "20.3.59"
+    version: "20.3.61"
   syncfusion_flutter_gauges:
     dependency: "direct dev"
     description:
       name: syncfusion_flutter_gauges
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "20.3.59"
+    version: "20.3.61"
   table_calendar:
     dependency: "direct main"
     description:

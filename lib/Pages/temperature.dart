@@ -6,7 +6,7 @@ import 'package:HPCS_app/cosmos.dart';
 
 class TemperaturePage extends StatelessWidget {
   final int value;
-  Cosmos cosmos = Cosmos( documentDBMasterKey:'insert key');
+  Cosmos cosmos = Cosmos( documentDBMasterKey:'master key');
   TemperaturePage({key, this.value = 0})
       : assert(value != null),
         super(key: key);
@@ -49,8 +49,9 @@ class TemperaturePage extends StatelessWidget {
                       style: TextStyle(color: Colors.blue),
                     ),
                     onPressed: () async {
+                      print("Test");
                       Map<String, dynamic> get_dbs = await cosmos.queryCosmos(
-                          url: 'https:// <insterturl>.documents.azure.com:443/dbs', method: 'GET');
+                          url: 'https://hpcs2.documents.azure.com:443/dbs/HPCSData/colls/Temperature/docs/', method: 'GET');
                       print("Hello");
                       print(get_dbs);
                     },
