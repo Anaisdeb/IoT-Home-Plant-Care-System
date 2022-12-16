@@ -3,13 +3,51 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:HPCS_app/helper.dart';
 import 'package:HPCS_app/cosmos.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class TemperaturePage extends StatelessWidget {
+class Temperature {
   final int value;
-  Cosmos cosmos = Cosmos( documentDBMasterKey:'master key');
-  TemperaturePage({key, this.value = 0})
-      : assert(value != null),
-        super(key: key);
+  final String date;
+
+  const Temperature({
+    required this.value,
+    required this.date,
+  });
+
+  factory Temperature.fromJson(Map<String, dynamic> json) {
+    return Temperature(
+      value: json['value'],
+      date: json['date'],
+    );
+  }
+}
+class TemperaturePage extends StatefulWidget {
+  const TemperaturePage({super.key});
+
+  @override
+  State<TemperaturePage> createState() => _TemperaturePage();
+}
+
+class _TemperaturePage extends State<TemperaturePage> {
+  late Future<List<Temperature>> temperatures;
+
+  Future<List<Temperature>> fetchTemperatures() async {
+    final response = await http.get(Uri.parse("https://hpcs-back-end.azurewebsites.net/temperatures"));
+    if (response.statusCode == 200) {
+      Iterable l = json.decode(response.body);
+      List<Temperature> temperatures = List<Temperature>.from(l.map((model)=> Temperature.fromJson(model)));
+      print(temperatures[0].value);
+      return temperatures;
+    } else {
+      throw Exception('Failed to load temperatures');
+    }
+  }
+  @override
+  void initState() {
+    super.initState();
+    temperatures = fetchTemperatures();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,62 +59,32 @@ class TemperaturePage extends StatelessWidget {
         body: Center(
             child: SingleChildScrollView(
                 child: Column(children: [
-                  Container(
-                      child: SfCartesianChart(
-                          title: ChartTitle(
-                              text: 'Monthly average history'),
+                  FutureBuilder<List<Temperature>>(
+                    future: temperatures,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Container(
+                            child: SfCartesianChart(
+                                title: ChartTitle(
+                                    text: 'Recent Temperature data'),
 // Initialize category axis
-                          primaryXAxis: CategoryAxis(),
-                          series: <ChartSeries>[
+                                primaryXAxis: CategoryAxis(),
+                                series: <ChartSeries>[
 // Initialize line series
-                            LineSeries<ChartData, String>(
-                                dataSource: [
-// Bind data source
-                                  ChartData('Jan', 8.3),
-                                  ChartData('Feb', 9.4),
-                                  ChartData('Mar', 11.6),
-                                  ChartData('Apr', 13.3),
-                                  ChartData('May', 16.67)
-                                ],
-                                xValueMapper: (ChartData data,
-                                    _) => data.x,
-                                yValueMapper: (ChartData data,
-                                    _) => data.y)
-                          ])),
-                  TextButton(
-                    child: const Text(
-                      'Connect',
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    onPressed: () async {
-                      print("Test");
-                      Map<String, dynamic> get_dbs = await cosmos.queryCosmos(
-                          url: 'https://hpcs2.documents.azure.com:443/dbs/HPCSData/colls/Temperature/docs/', method: 'GET');
-                      print("Hello");
-                      print(get_dbs);
+                                  LineSeries<ChartData, String>(
+                                      dataSource:  snapshot.data!.map((model) => ChartData(model.date, model.value.toDouble()) ).toList(),
+                                      xValueMapper: (ChartData data,
+                                          _) => data.x,
+                                      yValueMapper: (ChartData data,
+                                          _) => data.y)
+                                ]));
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      }
+
+                      // By default, show a loading spinner.
+                      return const CircularProgressIndicator();
                     },
-                  ),
-                  Container(
-                      child: SfCartesianChart(
-                          title: ChartTitle(
-                              text: 'Recent Temperature data'),
-// Initialize category axis
-                          primaryXAxis: CategoryAxis(),
-                          series: <ChartSeries>[
-// Initialize line series
-                            LineSeries<ChartData, String>(
-                                dataSource: [
-// Bind data source
-                                  ChartData('Sept-22', 21.7),
-                                  ChartData('Sept-23', 23.2),
-                                  ChartData('Sept-24', 22.6),
-                                  ChartData('Sept-25', 22.3),
-                                  ChartData('Sept-26', 23.2)
-                                ],
-                                xValueMapper: (ChartData data,
-                                    _) => data.x,
-                                yValueMapper: (ChartData data,
-                                    _) => data.y)
-                          ]))
+                  )
                 ]))));
   }}

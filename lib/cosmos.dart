@@ -105,12 +105,14 @@ class Cosmos{
       return completer.future;
     }
 
-    late HttpClientRequest request;
-    HttpClient httpClient = HttpClient();
-    if (method=='GET'){
-      request = await httpClient.getUrl(Uri.parse(url));
-    }
-    else if(method=='POST'){
+    //late http.Request request;
+    //HttpClient httpClient = HttpClient();
+    //var request = new http.Request("GET", Uri.parse(url));
+/*    if (method=='GET'){
+      //print(url);
+      request = new http.Request("GET", Uri.parse(url));
+    }*/
+/*    else if(method=='POST'){
       request = await httpClient.postUrl(Uri.parse(url));
     }
     else if(method=='PUT'){
@@ -118,21 +120,19 @@ class Cosmos{
     }
     else if(method=='DEL'){
       request = await httpClient.deleteUrl(Uri.parse(url));
-    }
-    headers.forEach((key, value) {
-      request.headers.set(key,value);
-    });
+    }*/
+    //request.headers.addAll(headers);
 
-    if(body != null) {
+/*    if(body != null) {
       request.add(utf8.encode(json.encode(body)));
-    }
+    }*/
 
-    HttpClientResponse aresponse = await request.close();
-    httpClient.close();
-    String aresponseString = await readResponse(aresponse);
+    var response = await http.get(Uri.parse(url), headers: headers);
+    //httpClient.close();
+    // responseString = await readResponse(response.body);
     print('stop');
 
-    return jsonDecode(aresponseString);
+    return jsonDecode(response.body);
 
   }
 }
