@@ -5,22 +5,7 @@ import 'package:HPCS_app/helper.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class Temperature {
-  final int value;
-  final String date;
 
-  const Temperature({
-    required this.value,
-    required this.date,
-  });
-
-  factory Temperature.fromJson(Map<String, dynamic> json) {
-    return Temperature(
-      value: json['value'],
-      date: json['date'],
-    );
-  }
-}
 class TemperaturePage extends StatefulWidget {
   const TemperaturePage({super.key});
 

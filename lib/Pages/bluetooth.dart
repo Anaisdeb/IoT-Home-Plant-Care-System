@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:HPCS_app/helper.dart';
 
 class BluetoothSettings extends StatefulWidget {
   BluetoothSettings({super.key});
@@ -258,6 +259,10 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
                 onPressed: () async {
                   characteristic.value.listen((value) {
                     widget.readValues[characteristic.uuid] = value;
+                    final response = http.post(Uri.parse("https://hpcs-back-end.azurewebsites.net/temperatures"), body: jsonEncode(<String, dynamic>{
+                      'date': DateTime.now().toString(),
+                      'value': value
+                    }));
                   });
                   await characteristic.setNotifyValue(true);
                 },
