@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_blue/flutter_blue.dart';
-import 'package:HPCS_app/helper.dart';
 
 class BluetoothSettings extends StatefulWidget {
   BluetoothSettings({super.key});
   final FlutterBlue flutterBlue = FlutterBlue.instance;
   final List<BluetoothDevice> devicesList =  <BluetoothDevice>[];
-  final Map<Guid, List<int>> readValues = <Guid, List<int>>{};
+  final Map<Guid, int> readValues = <Guid, int>{};
 
   @override
   State<BluetoothSettings> createState() => _BluetoothSettingsState();
@@ -33,9 +32,6 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
   void initState() {
     super.initState();
 
-    // DB connection
-    //TODO
-
     // Start scanning
     widget.flutterBlue.startScan(timeout: const Duration(seconds: 4));
 
@@ -44,7 +40,9 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
       // do something with scan results
       for (ScanResult result in results) {
         debugPrint("found one");
-        _addDeviceToList(result.device);
+        if(result.device.name != ''){
+          _addDeviceToList(result.device);
+        }
       }
     });
 
@@ -82,10 +80,12 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
                       rethrow;
                     }
                   } finally {
-                    _services = await device.discoverServices();
+                    _services = (await device.discoverServices()).where((m) => m.characteristics.any((c)=> c.properties.notify)).toList();
                   }
                   setState(() {
                     _connectedDevice = device;
+
+
                   });
                 },
               ),
@@ -127,10 +127,6 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
       List<Widget> characteristicsWidget = <Widget>[];
 
       for (BluetoothCharacteristic characteristic in service.characteristics) {
-        characteristic.value.listen((value) {
-          // ignore: avoid_print
-          print(value);
-        });
         characteristicsWidget.add(
           Align(
             alignment: Alignment.centerLeft,
@@ -138,17 +134,24 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    Text(characteristic.uuid.toString(), style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Flexible( child:Text("${_connectedDevice?.name}", style: const TextStyle(fontSize: 30), overflow: TextOverflow.fade)),
                   ],
                 ),
+                const Divider(),
+                Row(
+                  children: <Widget>[
+                    Flexible( child:Text("Service uuid : ${service.uuid.toString()}", style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.fade)),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    Flexible( child: Text("Characteristic uuid : ${characteristic.uuid.toString()}", style: const TextStyle(fontWeight: FontWeight.bold))),
+                  ],
+                ),
+                const Divider(),
                 Row(
                   children: <Widget>[
                     ..._buildReadWriteNotifyButton(characteristic),
-                  ],
-                ),
-                Row(
-                  children: <Widget>[
-                    Text('Value: ${widget.readValues[characteristic.uuid]}'),
                   ],
                 ),
                 const Divider(),
@@ -157,11 +160,7 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
           ),
         );
       }
-      containers.add(
-        ExpansionTile(
-            title: Text(service.uuid.toString()),
-            children: characteristicsWidget),
-      );
+      containers.addAll(characteristicsWidget);
     }
 
     return ListView(
@@ -176,77 +175,6 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
       BluetoothCharacteristic characteristic) {
     List<ButtonTheme> buttons = <ButtonTheme>[];
 
-    if (characteristic.properties.read) {
-      buttons.add(
-        ButtonTheme(
-          minWidth: 10,
-          height: 20,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ElevatedButton(
-              child: const Text('READ', style: TextStyle(color: Colors.white)),
-                onPressed: () async {
-                  var sub = characteristic.value.listen((value) {
-                    setState(() {
-                      widget.readValues[characteristic.uuid] = value;
-                    });
-                  });
-                  await characteristic.read();
-                  sub.cancel();
-                },
-            ),
-          ),
-        ),
-      );
-    }
-    if (characteristic.properties.write) {
-      buttons.add(
-        ButtonTheme(
-          minWidth: 10,
-          height: 20,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: ElevatedButton(
-              child: const Text('WRITE', style: TextStyle(color: Colors.white)),
-              onPressed: () async {
-                await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Write"),
-                        content: Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: TextField(
-                                controller: _writeController,
-                              ),
-                            ),
-                          ],
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child: const Text("Send"),
-                            onPressed: () {
-                              characteristic.write(utf8
-                                  .encode(_writeController.value.text));
-                              Navigator.pop(context);
-                            },
-                          ),
-                          TextButton(
-                            child: const Text("Cancel"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      );
-                    });
-              },
-            ),
-          ),
-        ),
-      );
-    }
     if (characteristic.properties.notify) {
       buttons.add(
         ButtonTheme(
@@ -255,14 +183,25 @@ class _BluetoothSettingsState extends State<BluetoothSettings> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ElevatedButton(
-              child: const Text('NOTIFY', style: TextStyle(color: Colors.white)),
+              child: const Text('Sync to cloud', style: TextStyle(color: Colors.white)),
                 onPressed: () async {
-                  characteristic.value.listen((value) {
-                    widget.readValues[characteristic.uuid] = value;
-                    final response = http.post(Uri.parse("https://hpcs-back-end.azurewebsites.net/temperatures"), body: jsonEncode(<String, dynamic>{
-                      'date': DateTime.now().toString(),
-                      'value': value
-                    }));
+                  characteristic.value.listen((value) async {
+                    widget.readValues[characteristic.uuid] = value.first;
+                    final response = await http.post(Uri.parse("https://hpcs-back-end.azurewebsites.net/temperatures"),
+                        headers: <String, String>{
+                          'Content-Type': 'application/json; charset=UTF-8',
+                        }, body: jsonEncode(<String, dynamic>{
+                          'date': DateTime.now().toString(),
+                          'value': value.first
+                        }));
+                    if (response.statusCode == 201) {
+                      // If the server did return a 201 CREATED response,
+                      return print("It worked");
+                    } else {
+                      // If the server did not return a 201 CREATED response,
+                      // then throw an exception.
+                      throw Exception('Failed to create album.');
+                    }
                   });
                   await characteristic.setNotifyValue(true);
                 },

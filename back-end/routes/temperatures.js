@@ -15,9 +15,9 @@ router.post('/', async function(request, response, next) {
     const client = await mongoClient.connect(process.env.mongodb);
     const db = client.db(`HPCSData`);
     const collection = db.collection('Temperature');
-    collection.insert({date: request.body.date, value: request.body.value})
+    await collection.insertOne({date: request.body.date, value: request.body.value});
+    response.status(201).send("201 - created");
     await client.close();
-    response.send("201 - created");
 });
 
 module.exports = router;
