@@ -1,14 +1,14 @@
-# HPCS-Application
-Flutter application for HPCS
-## Getting Started
+# IoT-Home Plant Care System-Application
 
-This project is a starting point for a Flutter application.
+## Composition of the project team
 
-A few resources to get you started if this is your first Flutter project:
+  * Anaïs Débureaux
+  * Laure Mouli
+  * Luca Topo
+  
+## Objectives
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  * Develop a flutter application with Bluetooth Low Energy (BLE)
+  * Implement data reception by pairing a BLE device
+  * Develop a Node.js API with Azure App service 
+  * Implement the sending of data to the Cosmos DB database of the Azure cloud computing platform through the API
